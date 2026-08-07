@@ -1,6 +1,10 @@
+출제자: 김지후
 
+-제목:우주탐사 데이터 분석
+
+'''
 import numpy as np
-
+#우주 탐사선 데이터 분석
 missions = np.array([
     "화성탐사",
     "달탐사",
@@ -24,7 +28,7 @@ data = np.array([
 #2총 점수가 가장 높은 탐사선 이름
 #3속도가 평균 이상인 탐사선 찾기
 #4탐사기간이 300일 이상인 탐사선 개수
-
+'''
 
 
 
@@ -57,4 +61,4 @@ print("속도가 평균이상인 탐사선 찾기",missions[a])
 period=data[:,2]
 # print(period)
 result= period>=300
-print("탐사 기간이 300일 이상인 탐사선 갯수"np.sum(result))
+print("탐사 기간이 300일 이상인 탐사선 갯수",np.sum(result))

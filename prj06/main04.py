@@ -11,5 +11,9 @@ print(result)
 # 3. 합격자 수
 pass_test=exam>=60
 count=np.sum(pass_test)
-print(count"명")
+print(count,"명")
 # 4. (도전) 90↑ "A", 70~89 "B", 그 외 "C"
+grade = np.where(exam >= 90, "A",
+         np.where(exam >= 70, "B", "C"))
+
+print(grade)

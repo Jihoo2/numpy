@@ -1,0 +1,136 @@
+
+#Retail Grocery annual sales Report
+import numpy as np
+
+# 각 employ idx == cate idx 가 일치한다는 가정
+employee = ['Ethan', 'Lena', 'Jason', 'Matt', 'Joy', 'Min', 'Erin']
+cate = ['Snacks', 'Drinks', 'Water', 'Meal Replacement', 'Source & seasoning', 'Coffee & tea', 'Healthy food']
+# ======== 분기별 매출 타겟 ========
+# 타겟 분기별 매출 (단위: 백만원)
+target_gmv = np.array([
+    [151, 103, 173, 119],  # snacks
+    [76, 65, 70, 194],  # drinks
+    [163, 158, 174, 168],  # water
+    [86, 92, 88, 95],  # meal replacement
+    [140, 97, 156, 108],  # source & seasoning
+    [76, 81, 79, 84],  # coffee & tea
+    [230, 241, 236, 253]  # healthy food
+])
+
+# ======== 작년/금년 분기별 매출 ========
+# 작년 분기별 GMV (단위: 백만원)
+ly_q_gmv = np.array([
+    [140, 95, 160, 110],
+    [65, 185, 68, 60],
+    [150, 145, 160, 155],
+    [80, 85, 82, 88],
+    [130, 90, 145, 100],
+    [70, 75, 73, 78],
+    [200, 210, 205, 220]
+])
+
+# 금년 분기별 GMV (단위: 백만원)
+cy_q_gmv = np.array([
+    [155, 88, 178, 102],  # snacks: 여전히 스파이크 있지만 전체적으론 소폭 성장
+    [62, 178, 65, 58],  # drinks: Q2에만 스파이크 유지, 여전히 매출 견인 못함
+    [158, 154, 170, 165],  # water: 마진 유지, 매출만 상승
+    [88, 94, 91, 98],  # meal replacement: 강한 성장
+    [172, 135, 190, 148],  # source & seasoning: 올리브유 흥행으로 매출 급성장
+    [58, 62, 60, 65],  # coffee & tea: 공급가 상승 여파로 매출 하락
+    [230, 242, 236, 253]  # healthy food: 카테고리 견인, 강한 성장
+])
+
+# ===== 작년/금년 분기별 마진율 (소수) =====
+
+# 작년 분기별 마진율
+ly_q_gm = np.array([
+    [0.20, 0.22, 0.21, 0.23],
+    [0.37, 0.35, 0.38, 0.37],
+    [0.48, 0.49, 0.48, 0.49],
+    [0.35, 0.36, 0.37, 0.36],
+    [0.30, 0.30, 0.31, 0.30],
+    [0.33, 0.34, 0.33, 0.35],
+    [0.40, 0.41, 0.42, 0.41]
+])
+
+# 금년 분기별 마진율
+cy_q_gm = np.array([
+    [0.21, 0.23, 0.22, 0.24],  # snacks: 여전히 저마진, 소폭 개선
+    [0.38, 0.36, 0.38, 0.37],  # drinks: 마진은 여전히 높음 (매출은 Q2만 반짝)
+    [0.48, 0.49, 0.48, 0.49],  # water: 마진 그대로 유지
+    [0.39, 0.40, 0.40, 0.40],  # meal replacement: 큰 개선
+    [0.33, 0.32, 0.34, 0.33],  # source & seasoning: 올리브유 효과로 마진도 개선
+    [0.28, 0.27, 0.26, 0.25],  # coffee & tea: 공급가 상승으로 마진 뚜렷하게 하락
+    [0.43, 0.44, 0.45, 0.45]  # healthy food: 마진도 확실히 견인
+])
+
+# 문제 1) 금년 타겟 달성 1위 사원-카테고리
+achievement = cy_q_gmv / target_gmv
+
+avg_achievement = np.mean(achievement, axis=1)
+
+idx = np.argmax(avg_achievement)
+
+print(employee[idx], cate[idx])
+# 문제 2) 금년 가장 큰 매출 성장율(YoY) 카테고리
+#("금년"-"작년"/"작년")
+yoy=(cy_q_gmv-ly_q_gmv)/ly_q_gmv
+avg_yoy = np.mean(yoy, axis=1)
+idx = np.argmax(avg_yoy)
+print(cate[idx])
+
+# 문제 3) 금년 Food 전체 마진율 YoY
+#매출*마진률=이익
+작년이익=np.sum(ly_q_gmv*ly_q_gm)
+금년이익=np.sum(cy_q_gmv*cy_q_gm)
+
+작년마진=작년이익/np.sum(ly_q_gmv)
+금년마진=금년이익/np.sum(cy_q_gmv)
+
+print(금년마진-작년마진)
+
+# 문제 4) 상위 50%에 속하는 카테고리들의 금년 마진율
+sales = np.mean(cy_q_gmv, axis=1)
+
+sale_idx = np.argsort(sales)[::-1]
+
+top_idx = sale_idx[:4]   # 7개 중 상위 50%
+
+print([cate[i] for i in top_idx])
+
+top_margin = np.mean(cy_q_gm[top_idx], axis=1)
+
+print(top_margin)
+# 문제 5) Grocery 전체 마진 기준 top 50% 이상 카테고리는 'top', 100% 'avg', 그 외는 'bottom'
+# 카테고리별 금년 평균 마진율
+margin = np.mean(cy_q_gm, axis=1)
+
+
+# 높은 순서로 정렬한 index
+rank_idx = np.argsort(margin)[::-1]
+
+
+# 결과 저장
+grade = [""] * len(cate)
+
+
+# 상위 50% (4개)
+for i in rank_idx[:4]:
+    grade[i] = "top"
+
+
+# 나머지 중간 (100% 기준에서 top 제외)
+for i in rank_idx[4:]:
+    grade[i] = "avg"
+
+
+# 하위는 bottom 처리
+# (조건 추가)
+
+
+for i in range(len(cate)):
+    if margin[i] < np.mean(margin):
+        grade[i] = "bottom"
+
+
+print(list(zip(cate, grade)))
