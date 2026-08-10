@@ -1,0 +1,9 @@
+#행+열 동시 선택
+import pandas as pd
+
+df= pd.read_csv("data/people.csv")
+# print(df.iloc[3,3])
+df = df.set_index("이름")
+# print(df.loc["라라",["나이","연봉"]])
+# print(df.iloc[0:3,0:3])
+print(df.loc["가영":"다희","나이":"도시"])
